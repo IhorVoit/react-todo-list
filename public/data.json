@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "title": "first todo",
+        "description": "pick up milk",
+        "complete": true
+    },
+    {
+        "id": 2,
+        "title": "second todo",
+        "description": "learn angular",
+        "complete": false
+    },
+    {
+        "id": 3,
+        "title": "third todo",
+        "description": "go for a run",
+        "complete": false
+    },
+    {
+        "id": 4,
+        "title": "fourth todo",
+        "description": "go shopping",
+        "complete": true
+    },
+    {
+        "id": 5,
+        "title": "fifth todo",
+        "description": "make dinner",
+        "complete": false
+    }
+]

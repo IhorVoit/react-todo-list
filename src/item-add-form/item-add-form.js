@@ -2,27 +2,31 @@ import React, { Component } from 'react'
 import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import AddIcon from '@material-ui/icons/Add'
+import Grid from '@material-ui/core/Grid'
 
 class ItemAddForm extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            value: ''
+            value: '',
+            description: ''
         }
     }
 
-    handleChange = (e) => {
+    handleChange = (label) => (e) => {
         this.setState({
-            value: e.target.value
+            [label]: e.target.value
         })
     }
 
     onItemAdd = () => {
-        if (this.state.value) {
-            this.props.addNewItem(this.state.value)
+        const { value, description } = this.state
+        if (value) {
+            this.props.addNewItem(value, description)
         }
         this.setState({
-            value: ''
+            value: '',
+            description: ''
         })
     }
 
@@ -37,21 +41,34 @@ class ItemAddForm extends Component {
     }
 
     render() {
-        const {value} = this.state;
+        const { value, description } = this.state;
         return <>
+            <Grid
+                container
+                justify='space-between'
+            >
+                <TextField
+                    value={value}
+                    onChange={this.handleChange('value')}
+                    onKeyPress={this.handleKeyPress}
+                    placeholder='Title'
+                />
+                <IconButton
+                    onClick={this.handleClickAddButton}
+                >
+                    <AddIcon />
+                </IconButton>
+            </Grid>
             <TextField
-                value={value}
-                onChange={this.handleChange}
+                value={description}
+                onChange={this.handleChange('description')}
                 onKeyPress={this.handleKeyPress}
                 fullWidth
+                variant='outlined'
+                placeholder='Description'
             />
-            <IconButton
-                onClick={this.handleClickAddButton}
-            >
-                <AddIcon />
-            </IconButton>
         </>
     }
 }
 
-export default ItemAddForm;
+export default ItemAddForm

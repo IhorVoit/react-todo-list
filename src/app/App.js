@@ -1,36 +1,70 @@
 import React, { Component } from 'react'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
 import TodoList from '../todo-list'
 import ItemAddForm from '../item-add-form'
-import Typography from '@material-ui/core/Typography'
 
 class App extends Component {
     constructor(props) {
         super(props)
-        this.id = 10
         this.state = {
-            todoData: [
-                this.createTodoItem('Create item'),
-                this.createTodoItem('Read item'),
-                this.createTodoItem('Update item'),
-                this.createTodoItem('Delete item'),
-            ]
+            todoData: [],
+            error: false
         }
     }
 
-    createTodoItem = (label) => {
+    setDataToStorage = (data) => {
+        localStorage.setItem('todoData', JSON.stringify(data))
+    }
+
+    getMaxId = (data) => {
+        let newData = data.map(item => item.id)
+        return Math.max(...newData) + 1
+    }
+
+    componentDidMount() {
+        if (localStorage.getItem('todoData')) {
+            const listItems = JSON.parse(localStorage.getItem('todoData'))
+            this.id = this.getMaxId(listItems)
+            this.setState({
+                todoData: listItems
+            })
+        } else {
+            fetch('data.json', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.setState({ todoData: data })
+                    this.id = this.getMaxId(data)
+                    this.setDataToStorage(data)
+                })
+                .catch(err => {
+                    this.setState({
+                        error: true
+                    })
+                })
+        }
+    }
+
+    createTodoItem = (title, description) => {
         return {
-            done: false,
+            complete: false,
             id: this.id++,
-            label
+            title,
+            description
         }
     }
 
-    addNewItem = (value) => {
-        const newItem = this.createTodoItem(value);
+    addNewItem = (title, description) => {
+        const newItem = this.createTodoItem(title, description);
         this.setState(({ todoData }) => {
             const newData = [...todoData, newItem]
+            this.setDataToStorage(newData)
             return {
                 todoData: newData
             }
@@ -39,9 +73,10 @@ class App extends Component {
 
     deleteItem = (id) => {
         this.setState(({ todoData }) => {
-            const newArray = todoData.filter(item => item.id !== id)
+            const newData = todoData.filter(item => item.id !== id)
+            this.setDataToStorage(newData)
             return {
-                todoData: newArray
+                todoData: newData
             }
         })
     }
@@ -63,31 +98,40 @@ class App extends Component {
         ]
     }
 
-    onEditListItem = (id, value) => {
-        this.setState(({todoData}) => {
+    onEditListItem = (id, title) => {
+        this.setState(({ todoData }) => {
+
             const [currentItem, idx] = this.findIndexAndElemFromArray(todoData, id)
-            const updateItem = {...currentItem, label: value}
+            const updateItem = { ...currentItem, title: title }
+            const newData = [
+                ...todoData.slice(0, idx),
+                updateItem,
+                ...todoData.slice(idx + 1)
+            ]
+
+            this.setDataToStorage(newData)
             return {
-                todoData: [
-                    ...todoData.slice(0, idx),
-                    updateItem,
-                    ...todoData.slice(idx + 1)
-                ]
+                todoData: newData
             }
         })
     }
 
-    onToggleDoneItem = (id) => {
+    toggleComplete = (id) => {
         this.setState(({ todoData }) => {
+            const newData = this.togglePropItem(todoData, id, 'complete')
+
+            this.setDataToStorage(newData)
             return {
-                todoData: this.togglePropItem(todoData, id, 'done')
+                todoData: newData
             }
         })
     }
 
     render() {
-        const { todoData } = this.state
-
+        const { todoData, error } = this.state
+        if (error) {
+            return <Typography>Some error with fetching data</Typography>
+        }
         return (
             <Grid
                 container
@@ -105,7 +149,7 @@ class App extends Component {
                     >
                         <TodoList
                             todoData={todoData}
-                            onToggleDoneItem={this.onToggleDoneItem}
+                            toggleComplete={this.toggleComplete}
                             onDeleteItem={this.deleteItem}
                             onToggleEdit={this.onToggleEdit}
                             onEditListItem={this.onEditListItem}
@@ -115,6 +159,7 @@ class App extends Component {
                 <Grid
                     item
                     container
+                    direction="column"
                     justify='space-between'
                     wrap='nowrap'
                     style={{ width: '100%', maxWidth: 500 }}

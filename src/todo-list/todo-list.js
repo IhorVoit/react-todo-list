@@ -2,9 +2,9 @@ import React from 'react'
 import List from '@material-ui/core/List'
 import TodoListItem from '../todo-list-item'
 
-const TodoList = ({todoData, onToggleDoneItem, onDeleteItem, onEditListItem}) => {
-    const onToggleDone = (id) => () => {
-        onToggleDoneItem(id)
+const TodoList = ({todoData, toggleComplete, onDeleteItem, onEditListItem}) => {
+    const onToggleComplete = (id) => () => {
+        toggleComplete(id)
     }
     const onDelete = (id) => () => {
         onDeleteItem(id)
@@ -17,7 +17,8 @@ const TodoList = ({todoData, onToggleDoneItem, onDeleteItem, onEditListItem}) =>
             {todoData.map(({id, ...item}) => {
                 return <TodoListItem
                     key={id}
-                    onToggleDone={onToggleDone(id)}
+                    id={id}
+                    toggleComplete={onToggleComplete(id)}
                     onDelete={onDelete(id)}
                     onEditListItem={handleEditListItem(id)}
                     {...item}

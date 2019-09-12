@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
@@ -9,29 +10,29 @@ import EditIcon from '@material-ui/icons/Edit'
 import TextField from '@material-ui/core/TextField'
 
 
-const TodoListItem = ({ done, id, label, onToggleDone, onDelete, toggleEdit, onEditListItem }) => {
+const TodoListItem = ({ complete, id, title, toggleComplete, onDelete, onEditListItem }) => {
     const [editable, setEditable] = useState(false)
-    const handleEdit = () => {
+    const toggleEdit = () => {
         setEditable(editable => !editable)
     }
     return (
         <ListItem key={id}>
             <ListItemIcon>
                 <CheckBox
-                    checked={done}
-                    onChange={onToggleDone}
+                    checked={complete}
+                    onChange={toggleComplete}
                 />
             </ListItemIcon>
             {editable ? <TextField
                 fullWidth
-                value={label}
+                value={title}
                 onChange={onEditListItem}
             /> : <ListItemText
-                primary={label}
-                style={{ textDecoration: done ? 'line-through' : null }}
-            />}
+                    primary={<Link to={`/todoitem/${id}`} style={{textDecoration: 'none', color: 'inherit'}}>{title}</Link>}
+                    style={{ textDecoration: complete ? 'line-through' : null }}
+                />}
             <IconButton
-                onClick={handleEdit}
+                onClick={toggleEdit}
             >
                 <EditIcon />
             </IconButton>
