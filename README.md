@@ -1,5 +1,5 @@
 React simple Todo List app
 
-clone this repo 
+clone this repo
 
-run npm i and npm start
+cd react-todo-list && npm i && npm start
